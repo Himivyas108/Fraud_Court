@@ -1,0 +1,13 @@
+services:
+  fraudcourt:
+    build: .
+    ports:
+      - "8000:7860"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash-lite}
+      - LIABILITY_SHARE=${LIABILITY_SHARE:-0.20}
+      - FRAUDCOURT_DB_PATH=/app/data/fraudcourt.db
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports

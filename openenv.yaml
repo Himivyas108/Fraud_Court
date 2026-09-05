@@ -1,0 +1,41 @@
+spec_version: 1
+name: fraudcourt
+title: "FraudCourt — Calibrated Fraud & Chargeback Adjudication Environment"
+description: >
+  An agent investigates a transaction/chargeback dispute, may convene an
+  adversarial Court Panel (Prosecutor/Defender/Judge) when evidence
+  conflicts, and must declare a calibrated confidence (HIGH/MED/LOW)
+  before every terminal decision. Reward is a deterministic 3x2 matrix
+  that penalizes confident wrongness far more than uncertain wrongness.
+endpoints:
+  reset: POST /reset
+  step: POST /step
+  state: GET /state
+  tasks: GET /tasks
+  health: GET /health
+  schema: GET /schema
+investigative_actions:
+  - check_device_fingerprint
+  - query_transaction_history
+  - verify_cardholder_identity
+  - check_velocity
+  - check_merchant_risk_category
+  - check_dispute_history
+  - convene_debate_panel
+terminal_actions:
+  - flag_fraud
+  - allow_transaction
+  - escalate_to_review
+confidence_levels: [HIGH, MED, LOW]
+reward:
+  range: [-0.8, 1.0]
+  matrix:
+    HIGH_correct: 1.0
+    HIGH_wrong: -0.8
+    MED_correct: 0.6
+    MED_wrong: -0.2
+    LOW_correct: 0.1
+    LOW_wrong: 0.0
+supports_concurrent_sessions: true
+max_concurrent_envs: 64
+deployment: docker
