@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FraudCourt — Calibrated Fraud &amp; Chargeback Adjudication</title>
+<style>
+  :root{
+    --ink:#0E1319;
+    --surface:#161D26;
+    --surface-2:#1C2530;
+    --line:#2B3542;
+    --parchment:#E9E5D8;
+    --muted:#8B93A1;
+    --brass:#C9A227;
+    --brass-dim:#8A751F;
+    --danger:#C1443C;
+    --safe:#4F9D69;
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --mono: "IBM Plex Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--ink);color:var(--parchment);font-family:var(--serif);}
+  body{min-height:100vh;}
+  a{color:var(--brass);}
+
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding:28px clamp(16px,4vw,48px) 20px;
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;
+  }
+  .wordmark{font-size:clamp(28px,4vw,40px);letter-spacing:0.5px;margin:0;font-weight:600;}
+  .wordmark em{font-style:normal;color:var(--brass);}
+  .tagline{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:6px 0 0;max-width:520px;line-height:1.5;}
+  .badge{
+    font-family:var(--mono);font-size:11.5px;padding:6px 12px;border:1px solid var(--line);
+    border-radius:2px;color:var(--muted);white-space:nowrap;
+  }
+  .badge.on{color:var(--safe);border-color:#2C4A38;}
+  .badge.off{color:var(--brass);border-color:#4A3F1A;}
+
+  nav.tabs{
+    display:flex;gap:2px;border-bottom:1px solid var(--line);
+    padding:0 clamp(16px,4vw,48px);overflow-x:auto;
+  }
+  nav.tabs button{
+    font-family:var(--mono);font-size:12.5px;background:none;border:none;color:var(--muted);
+    padding:14px 18px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;
+  }
+  nav.tabs button.active{color:var(--parchment);border-bottom-color:var(--brass);}
+  nav.tabs button:hover{color:var(--parchment);}
+
+  main{padding:28px clamp(16px,4vw,48px) 80px;max-width:1180px;margin:0 auto;}
+  section.view{display:none;}
+  section.view.active{display:block;}
+
+  h2.section-title{font-size:20px;font-weight:600;margin:0 0 4px;}
+  p.section-sub{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 22px;line-height:1.6;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:26px;}
+  .stat{border:1px solid var(--line);padding:16px 18px;background:var(--surface);}
+  .stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .stat .value{font-size:26px;margin-top:6px;font-weight:600;}
+  .stat .value.small{font-size:18px;}
+
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+  select,button.btn,textarea,input[type=text]{
+    font-family:var(--mono);font-size:12.5px;background:var(--surface-2);color:var(--parchment);
+    border:1px solid var(--line);padding:9px 12px;border-radius:2px;
+  }
+  button.btn{cursor:pointer;color:var(--parchment);transition:border-color .15s;}
+  button.btn:hover{border-color:var(--brass);}
+  button.btn.primary{background:var(--brass);color:#1A1503;border-color:var(--brass);font-weight:600;}
+  button.btn.primary:hover{background:#DCAF2E;}
+  button.btn.danger{border-color:#5A2622;color:#E38076;}
+  button.btn.danger:hover{border-color:var(--danger);}
+  button.btn:disabled{opacity:.45;cursor:default;}
+  textarea{width:100%;min-height:60px;resize:vertical;}
+
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:500;}
+
+  .matrix{border-collapse:collapse;margin-top:6px;}
+  .matrix th,.matrix td{border:1px solid var(--line);padding:12px 18px;text-align:center;font-family:var(--mono);}
+  .matrix th{color:var(--muted);font-weight:500;}
+  .matrix td.hit{background:var(--brass);color:#1A1503;font-weight:700;}
+
+  .card{border:1px solid var(--line);background:var(--surface);padding:18px 20px;margin-bottom:14px;}
+  .card h3{margin:0 0 10px;font-size:14.5px;font-weight:600;}
+  .card .meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px;}
+  .pill{display:inline-block;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:12px;margin-left:6px;}
+  .pill.fraud{background:#3A1B18;color:#E38076;}
+  .pill.legit{background:#1B3324;color:#7FC79A;}
+  .pill.high{background:#3A1B18;color:#E38076;}
+  .pill.med{background:#3A2F0F;color:#E3C160;}
+  .pill.low{background:#16222A;color:#8FB4C7;}
+
+  .trace-step{border-left:2px solid var(--line);padding:8px 0 8px 16px;margin-left:4px;font-size:13.5px;}
+  .trace-step .kind{font-family:var(--mono);font-size:10.5px;color:var(--brass);letter-spacing:.5px;}
+  .trace-step p{margin:4px 0 0;color:var(--parchment);}
+  .debate-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0;}
+  @media (max-width:640px){.debate-cols{grid-template-columns:1fr;}}
+  .debate-col{border:1px solid var(--line);padding:12px 14px;}
+  .debate-col h4{margin:0 0 6px;font-size:12.5px;color:var(--muted);font-weight:500;}
+  .verdict-box{border:1px solid var(--brass-dim);background:#1C1A0C;padding:12px 14px;margin-top:10px;}
+
+  .empty{font-family:var(--mono);font-size:12.5px;color:var(--muted);padding:24px 0;}
+  .footnote{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:30px;line-height:1.7;border-top:1px solid var(--line);padding-top:16px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <p class="wordmark">Fraud<em>Court</em></p>
+    <p class="tagline">A held-out-scored fraud &amp; chargeback environment. Investigate → debate → declare a calibrated confidence — scored on whether that confidence was honest, not just whether the call was right.</p>
+  </div>
+  <div id="health-badge" class="badge">checking backend…</div>
+</header>
+
+<nav class="tabs">
+  <button data-view="dashboard" class="active">01 · Dashboard</button>
+  <button data-view="live">02 · Live Case Runner</button>
+  <button data-view="audit">03 · Audit Queue</button>
+  <button data-view="kb">04 · Knowledge Base</button>
+  <button data-view="failures">05 · Failures Ledger</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="view-dashboard">
+    <h2 class="section-title">Held-out batch performance</h2>
+    <p class="section-sub">Every number below is computed live from a fresh run — nothing here is hand-edited. Same seed range always reproduces the same batch.</p>
+
+    <div class="row">
+      <button class="btn primary" id="btn-run-batch">Run held-out batch (40 cases)</button>
+      <button class="btn" id="btn-run-golden">Run Golden Trap suite (15 hand-authored cases)</button>
+      <button class="btn" id="btn-run-ablation">Run ablation — naive vs. full pipeline</button>
+      <span id="batch-status" style="font-family:var(--mono);font-size:12px;color:var(--muted);"></span>
+    </div>
+
+    <div class="grid" id="batch-stats"></div>
+
+    <div id="ablation-panel"></div>
+
+    <div id="calibration-table"></div>
+  </section>
+
+  <!-- LIVE CASE RUNNER -->
+  <section class="view" id="view-live">
+    <h2 class="section-title">Run a case</h2>
+    <p class="section-sub">Pick a task, then watch the agent investigate, optionally convene the Court Panel, and commit to a confidence-tagged decision.</p>
+
+    <div class="row">
+      <select id="task-select"></select>
+      <button class="btn primary" id="btn-run-episode">Run episode</button>
+      <button class="btn danger" id="btn-break-it" disabled title="Injects a real failure into the current episode's next step">Break it (inject failure)</button>
+    </div>
+
+    <div id="live-output"><p class="empty">No episode run yet. Pick a task above and click "Run episode".</p></div>
+  </section>
+
+  <!-- AUDIT QUEUE -->
+  <section class="view" id="view-audit">
+    <h2 class="section-title">Auditor queue</h2>
+    <p class="section-sub">Every escalation, plus every HIGH-confidence fraud flag, lands here for a human to confirm or overturn. The override itself is never mediated by a model.</p>
+    <div id="audit-list"><p class="empty">Loading…</p></div>
+  </section>
+
+  <!-- KNOWLEDGE BASE -->
+  <section class="view" id="view-kb">
+    <h2 class="section-title">Precedent knowledge base</h2>
+    <p class="section-sub">Structured key-match over evidence signatures (fraud_type + which tools fired fraud/benign). Deliberately not a vector store — fully explainable, no black box.</p>
+    <div id="kb-list"><p class="empty">Loading…</p></div>
+  </section>
+
+  <!-- FAILURES -->
+  <section class="view" id="view-failures">
+    <h2 class="section-title">Failures ledger</h2>
+    <p class="section-sub">Auto-generated postmortem for every real or injected failure: what broke, what the system did, and the outcome. Demo-mode fallbacks (no API key configured) are not logged here — only genuine incidents.</p>
+    <div id="failures-list"><p class="empty">Loading…</p></div>
+  </section>
+
+</main>
+
+<script>
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+$$('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    $$('.view').forEach(v => v.classList.remove('active'));
+    $('#view-' + btn.dataset.view).classList.add('active');
+    if (btn.dataset.view === 'audit') loadAuditQueue();
+    if (btn.dataset.view === 'kb') loadKnowledgeBase();
+    if (btn.dataset.view === 'failures') loadFailures();
+  });
+});
+
+async function loadHealth(){
+  try{
+    const r = await fetch('/health'); const d = await r.json();
+    const b = $('#health-badge');
+    if (d.llm_enabled){
+      b.textContent = `LLM mode · ${d.model}`; b.className = 'badge on';
+    } else {
+      b.textContent = 'Heuristic / demo mode (no GEMINI_API_KEY)'; b.className = 'badge off';
+    }
+  }catch(e){
+    $('#health-badge').textContent = 'backend unreachable';
+  }
+}
+loadHealth();
+
+async function loadTasks(){
+  const r = await fetch('/tasks'); const d = await r.json();
+  const sel = $('#task-select');
+  sel.innerHTML = d.tasks.map(t => `<option value="${t.task_id}">${t.task_id} — ${t.description}</option>`).join('');
+}
+loadTasks();
+
+function fmtPct(x){ return x === null || x === undefined ? '—' : (x*100).toFixed(1) + '%'; }
+function fmtInr(x){ return '₹' + Number(x).toLocaleString('en-IN', {maximumFractionDigits:0}); }
+
+function renderBatchStats(r){
+  $('#batch-stats').innerHTML = `
+    <div class="stat"><div class="label">precision</div><div class="value">${fmtPct(r.precision)}</div></div>
+    <div class="stat"><div class="label">recall</div><div class="value">${fmtPct(r.recall)}</div></div>
+    <div class="stat"><div class="label">calibration score</div><div class="value">${fmtPct(r.calibration_score)}</div></div>
+    <div class="stat"><div class="label">cases scored</div><div class="value">${r.n_cases}</div></div>
+    <div class="stat"><div class="label">cost of overconfidence</div><div class="value small">${fmtInr(r.total_cost_of_overconfidence_inr)}</div></div>
+    <div class="stat"><div class="label">court panel calls</div><div class="value small">${r.court_panel_llm_calls} llm / ${r.court_panel_heuristic_fallback_calls} fallback</div></div>
+  `;
+  const tiers = ['HIGH','MED','LOW'];
+  $('#calibration-table').innerHTML = `
+    <h3 style="font-size:14px;margin:18px 0 8px;">Calibration by declared confidence tier</h3>
+    <table>
+      <thead><tr><th>tier</th><th>correct</th><th>total</th><th>correctness rate</th><th>false-positive cost</th></tr></thead>
+      <tbody>
+        ${tiers.map(t => {
+          const c = r.calibration_by_tier[t];
+          const cost = r.false_positive_cost_by_tier_inr[t];
+          return `<tr><td>${t}</td><td>${c.correct}</td><td>${c.total}</td><td>${fmtPct(c.rate)}</td><td>${fmtInr(cost)}</td></tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+$('#btn-run-batch').addEventListener('click', async () => {
+  $('#batch-status').textContent = 'running 40 cases…';
+  const r = await fetch('/run_batch', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({n:40, seed_start:1000, use_golden_trap:false})});
+  const d = await r.json();
+  renderBatchStats(d);
+  $('#batch-status').textContent = `done in ${d.duration_seconds}s · run_id ${d.run_id}`;
+});
+
+$('#btn-run-golden').addEventListener('click', async () => {
+  $('#batch-status').textContent = 'running golden trap suite…';
+  const r = await fetch('/run_batch', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({use_golden_trap:true})});
+  const d = await r.json();
+  renderBatchStats(d);
+  $('#batch-status').textContent = `golden trap done · run_id ${d.run_id}`;
+});
+
+$('#btn-run-ablation').addEventListener('click', async () => {
+  $('#batch-status').textContent = 'running naive-vs-full ablation…';
+  const r = await fetch('/run_ablation?n=30&seed_start=2000');
+  const d = await r.json();
+  $('#ablation-panel').innerHTML = `
+    <div class="card">
+      <h3>Ablation — naive single-shot vs. the full pipeline (same ${d.n_cases} held-out seeds)</h3>
+      <table>
+        <thead><tr><th>policy</th><th>precision</th><th>recall</th><th>calibration score</th><th>cost of overconfidence</th></tr></thead>
+        <tbody>
+          <tr><td>naive (no investigation, always HIGH)</td><td>${fmtPct(d.naive_single_shot.precision)}</td><td>${fmtPct(d.naive_single_shot.recall)}</td><td>${fmtPct(d.naive_single_shot.calibration_score)}</td><td>${fmtInr(d.naive_single_shot.total_cost_of_overconfidence_inr)}</td></tr>
+          <tr><td>full (investigate → debate → calibrate)</td><td>${fmtPct(d.full_pipeline.precision)}</td><td>${fmtPct(d.full_pipeline.recall)}</td><td>${fmtPct(d.full_pipeline.calibration_score)}</td><td>${fmtInr(d.full_pipeline.total_cost_of_overconfidence_inr)}</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin-top:10px;">Calibration score delta: <strong style="color:var(--brass)">+${(d.calibration_score_delta*100).toFixed(1)} pts</strong> ·
+      Cost of overconfidence avoided by the full pipeline: <strong style="color:var(--brass)">${fmtInr(d.cost_of_overconfidence_delta_inr)}</strong></p>
+    </div>
+  `;
+  $('#batch-status').textContent = `ablation done`;
+});
+
+let currentEpisodeId = null;
+
+function matrixHtml(score){
+  const cellId = score ? score.matrix_cell.replace('/','-') : null;
+  const tiers = ['HIGH','MED','LOW'];
+  const outcomes = ['CORRECT','WRONG'];
+  return `
+    <table class="matrix">
+      <thead><tr><th></th><th>Correct</th><th>Wrong</th></tr></thead>
+      <tbody>
+        ${tiers.map(t => `<tr><th>${t}</th>${outcomes.map(o => {
+          const id = `${t}-${o}`;
+          const hit = cellId === id ? 'hit' : '';
+          const val = {'HIGH-CORRECT':'+1.0','HIGH-WRONG':'−0.8','MED-CORRECT':'+0.6','MED-WRONG':'−0.2','LOW-CORRECT':'+0.1','LOW-WRONG':'0.0'}[id];
+          return `<td class="${hit}">${val}</td>`;
+        }).join('')}</tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderEpisode(ep){
+  currentEpisodeId = ep.episode_id;
+  $('#btn-break-it').disabled = ep.status !== 'active';
+
+  let html = `
+    <div class="card">
+      <h3>${ep.case.merchant_name} · ${fmtInr(ep.case.amount)} · ${ep.case.dispute_reason_code}
+        <span class="pill ${ep.status === 'terminal' ? (ep.score.is_correct ? 'legit':'fraud') : 'med'}">${ep.status}</span>
+      </h3>
+      <div class="meta">episode ${ep.episode_id} · case ${ep.case.id} · channel ${ep.case.visible.channel} · customer ${ep.case.customer_name}</div>
+    </div>
+    <h3 style="font-size:14px;margin:18px 0 6px;">Investigation trace</h3>
+  `;
+
+  ep.trace.forEach(step => {
+    if (step.type === 'reset') {
+      html += `<div class="trace-step"><div class="kind">RESET</div><p>${step.message}</p></div>`;
+    } else if (step.type === 'investigate') {
+      html += `<div class="trace-step"><div class="kind">INVESTIGATE · ${step.tool}</div><p>${step.result}</p></div>`;
+    } else if (step.type === 'court_panel') {
+      const r = step.record;
+      html += `
+        <div class="trace-step">
+          <div class="kind">COURT PANEL ${r.mode === 'llm' ? '(LLM)' : '(heuristic fallback)'}</div>
+          <div class="debate-cols">
+            <div class="debate-col"><h4>Prosecutor — ${r.prosecutor_argument.strength}</h4><p>${r.prosecutor_argument.argument}</p></div>
+            <div class="debate-col"><h4>Defender — ${r.defender_argument.strength}</h4><p>${r.defender_argument.argument}</p></div>
+          </div>
+          <div class="verdict-box"><strong>Judge verdict:</strong> ${r.verdict.recommendation} (leaning ${r.verdict.confidence_leaning})<br><span style="color:var(--muted)">${r.verdict.reasoning}</span></div>
+        </div>`;
+    } else if (step.type === 'terminal_decision') {
+      const s = step.score;
+      html += `
+        <div class="trace-step">
+          <div class="kind">TERMINAL DECISION</div>
+          <p><strong>${step.action}</strong> at <span class="pill ${step.confidence.toLowerCase()}">${step.confidence}</span> confidence
+             — ground truth was <strong>${s.ground_truth_label}</strong> → ${s.is_correct ? 'CORRECT' : 'WRONG'}</p>
+          <p style="color:var(--muted)">${s.explanation}</p>
+          ${matrixHtml(s)}
+          ${s.anti_gaming.triggered ? `<p style="color:var(--danger);margin-top:8px;">⚠ Anti-gaming detector triggered — LOW-rate ${fmtPct(s.anti_gaming.low_rate)} over last ${s.anti_gaming.window_size} decisions. Reward multiplier: ${s.anti_gaming.penalty_multiplier}x</p>` : ''}
+          ${s.precedent_matches.length ? `<div class="card" style="margin-top:12px;"><h3 style="font-size:12.5px;">Related precedent found (${s.precedent_matches.length})</h3>${s.precedent_matches.slice(0,3).map(p => `<p class="meta">${p.auditor_decision} · "${p.reason_text}"</p>`).join('')}</div>` : ''}
+        </div>`;
+    } else if (step.type === 'forced_escalation') {
+      html += `<div class="trace-step"><div class="kind">FORCED ESCALATION</div><p>${step.message}</p></div>`;
+    } else if (step.type === 'audit_feedback') {
+      html += `<div class="trace-step"><div class="kind">AUDITOR FEEDBACK</div><p>${step.record.auditor_decision} — "${step.record.reason_text}"</p></div>`;
+    }
+  });
+
+  $('#live-output').innerHTML = html;
+}
+
+$('#btn-run-episode').addEventListener('click', async () => {
+  $('#live-output').innerHTML = '<p class="empty">Running…</p>';
+  const task_id = $('#task-select').value;
+  const r = await fetch('/run_autopilot_episode', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({task_id})});
+  const ep = await r.json();
+  renderEpisode(ep);
+});
+
+$('#btn-break-it').addEventListener('click', async () => {
+  if (!currentEpisodeId) return;
+  const r = await fetch('/debug/inject_failure', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({episode_id: currentEpisodeId, component:'court_panel'})});
+  const d = await r.json();
+  renderEpisode(d.episode);
+  alert('Injected failure: ' + d.failure_record.what_broke + '\n\nRecovery: ' + d.failure_record.what_we_did);
+});
+
+async function loadAuditQueue(){
+  const r = await fetch('/audit_queue'); const d = await r.json();
+  if (!d.pending.length){ $('#audit-list').innerHTML = '<p class="empty">Queue is empty. Run some episodes first — escalations and HIGH-confidence fraud flags land here.</p>'; return; }
+  $('#audit-list').innerHTML = d.pending.map(ep => `
+    <div class="card">
+      <h3>${ep.case.id} <span class="pill ${ep.score.ground_truth_label === 'fraud' ? 'fraud':'legit'}">system said: ${ep.decision.action} / ${ep.decision.confidence}</span></h3>
+      <div class="meta">${ep.case.merchant_name} · ${fmtInr(ep.case.amount)} · ${ep.case.dispute_reason_code}</div>
+      <textarea placeholder="Reason for your decision..." id="reason-${ep.episode_id}"></textarea>
+      <div class="row" style="margin-top:8px;margin-bottom:0;">
+        <button class="btn" onclick="submitAudit('${ep.episode_id}','flag_fraud')">Confirm / flag fraud</button>
+        <button class="btn" onclick="submitAudit('${ep.episode_id}','allow_transaction')">Overturn → allow</button>
+        <button class="btn" onclick="submitAudit('${ep.episode_id}','escalate_to_review')">Keep escalated</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function submitAudit(episodeId, decision){
+  const reason = $('#reason-' + episodeId).value.trim();
+  if (!reason){ alert('Please enter a reason.'); return; }
+  await fetch(`/cases/${episodeId}/audit_feedback`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({auditor_decision: decision, reason})});
+  loadAuditQueue();
+  loadKnowledgeBase();
+}
+window.submitAudit = submitAudit;
+
+async function loadKnowledgeBase(){
+  const r = await fetch('/knowledge_base'); const d = await r.json();
+  if (!d.entries.length){ $('#kb-list').innerHTML = '<p class="empty">No corrections recorded yet. Auditor feedback populates this view.</p>'; return; }
+  $('#kb-list').innerHTML = `
+    <table>
+      <thead><tr><th>evidence signature</th><th>corrections</th><th>overturn rate</th><th>last seen</th></tr></thead>
+      <tbody>
+        ${d.entries.map(e => `<tr><td>${e.evidence_signature}</td><td>${e.n}</td><td>${fmtPct(e.overturn_rate)}</td><td>${e.last_seen}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+async function loadFailures(){
+  const r = await fetch('/failures'); const d = await r.json();
+  if (!d.failures.length){ $('#failures-list').innerHTML = '<p class="empty">No incidents logged. Press "Break it" on the Live Case Runner tab to see a live recovery.</p>'; return; }
+  $('#failures-list').innerHTML = d.failures.map(f => `
+    <div class="card">
+      <h3>${f.component} <span class="meta">· ${f.created_at}</span></h3>
+      <p><strong>What broke:</strong> ${f.what_broke}</p>
+      <p><strong>What we did:</strong> ${f.what_we_did}</p>
+      <p><strong>Outcome:</strong> ${f.outcome}</p>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
