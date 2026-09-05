@@ -1,0 +1,61 @@
+{
+  "run_id": "run_00f24385",
+  "policy": "full",
+  "n_cases": 15,
+  "mode": "golden_trap",
+  "seed_start": null,
+  "generated_at": 1788625969.1239624,
+  "duration_seconds": 0.0,
+  "confusion_matrix": {
+    "true_positive": 4,
+    "false_positive": 0,
+    "true_negative": 7,
+    "false_negative": 4
+  },
+  "precision": 1.0,
+  "recall": 0.5,
+  "f1": 0.667,
+  "calibration_score": 0.95,
+  "calibration_by_tier": {
+    "HIGH": {
+      "correct": 1,
+      "total": 1,
+      "rate": 1.0
+    },
+    "MED": {
+      "correct": 10,
+      "total": 12,
+      "rate": 0.8333333333333334
+    },
+    "LOW": {
+      "correct": 2,
+      "total": 2,
+      "rate": 1.0
+    }
+  },
+  "false_positive_cost_by_tier_inr": {
+    "HIGH": 0.0,
+    "MED": 0.0,
+    "LOW": 0.0
+  },
+  "total_cost_of_overconfidence_inr": 0.0,
+  "court_panel_llm_calls": 0,
+  "court_panel_heuristic_fallback_calls": 14,
+  "case_ids": [
+    "case_16dc368a89_friendly_fraud",
+    "case_37834f2f25_friendly_fraud",
+    "case_454f63ac30_stolen_card",
+    "case_5ef6fdf325_stolen_card",
+    "case_1253e9373e_account_takeover",
+    "case_482d9673cf_account_takeover",
+    "case_3346f2bbf6_merchant_collusion",
+    "case_9537f32ec7_merchant_collusion",
+    "case_0fd42b3f73_refund_abuse",
+    "case_9bdb2af679_refund_abuse",
+    "case_f6e0a1e2ac_friendly_fraud",
+    "case_b1556dea32_friendly_fraud",
+    "case_6c658ee83f_stolen_card",
+    "case_9f1f9dce31_account_takeover",
+    "case_28dae7c8bd_refund_abuse"
+  ]
+}

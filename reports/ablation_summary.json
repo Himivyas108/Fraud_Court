@@ -1,0 +1,110 @@
+{
+  "n_cases": 6,
+  "seed_start": 9000,
+  "naive_single_shot": {
+    "run_id": "run_e1a7d56b",
+    "policy": "naive",
+    "n_cases": 6,
+    "mode": "random_held_out",
+    "seed_start": 9000,
+    "generated_at": 1788626079.0871341,
+    "duration_seconds": 0.0,
+    "confusion_matrix": {
+      "true_positive": 2,
+      "false_positive": 3,
+      "true_negative": 0,
+      "false_negative": 1
+    },
+    "precision": 0.4,
+    "recall": 0.667,
+    "f1": 0.5,
+    "calibration_score": 0.333,
+    "calibration_by_tier": {
+      "HIGH": {
+        "correct": 2,
+        "total": 6,
+        "rate": 0.3333333333333333
+      },
+      "MED": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "LOW": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      }
+    },
+    "false_positive_cost_by_tier_inr": {
+      "HIGH": 33682.59,
+      "MED": 0.0,
+      "LOW": 0.0
+    },
+    "total_cost_of_overconfidence_inr": 33682.59,
+    "court_panel_llm_calls": 0,
+    "court_panel_heuristic_fallback_calls": 0,
+    "case_ids": [
+      "case_c4fe6b6dbe_account_takeover",
+      "case_13b7994fae_stolen_card",
+      "case_e609d53312_account_takeover",
+      "case_4023f322ac_refund_abuse",
+      "case_002abd21b8_merchant_collusion",
+      "case_af956f342c_account_takeover"
+    ]
+  },
+  "full_pipeline": {
+    "run_id": "run_8e075c26",
+    "policy": "full",
+    "n_cases": 6,
+    "mode": "random_held_out",
+    "seed_start": 9000,
+    "generated_at": 1788626079.088656,
+    "duration_seconds": 0.0,
+    "confusion_matrix": {
+      "true_positive": 2,
+      "false_positive": 0,
+      "true_negative": 3,
+      "false_negative": 1
+    },
+    "precision": 1.0,
+    "recall": 0.667,
+    "f1": 0.8,
+    "calibration_score": 1.0,
+    "calibration_by_tier": {
+      "HIGH": {
+        "correct": 1,
+        "total": 1,
+        "rate": 1.0
+      },
+      "MED": {
+        "correct": 4,
+        "total": 4,
+        "rate": 1.0
+      },
+      "LOW": {
+        "correct": 1,
+        "total": 1,
+        "rate": 1.0
+      }
+    },
+    "false_positive_cost_by_tier_inr": {
+      "HIGH": 0.0,
+      "MED": 0.0,
+      "LOW": 0.0
+    },
+    "total_cost_of_overconfidence_inr": 0.0,
+    "court_panel_llm_calls": 0,
+    "court_panel_heuristic_fallback_calls": 5,
+    "case_ids": [
+      "case_c4fe6b6dbe_account_takeover",
+      "case_13b7994fae_stolen_card",
+      "case_e609d53312_account_takeover",
+      "case_4023f322ac_refund_abuse",
+      "case_002abd21b8_merchant_collusion",
+      "case_af956f342c_account_takeover"
+    ]
+  },
+  "calibration_score_delta": 0.667,
+  "cost_of_overconfidence_delta_inr": 33682.59
+}

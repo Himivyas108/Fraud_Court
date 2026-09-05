@@ -1,0 +1,54 @@
+{
+  "run_id": "run_30629a74",
+  "policy": "full",
+  "n_cases": 8,
+  "mode": "random_held_out",
+  "seed_start": 5000,
+  "generated_at": 1788626079.0796921,
+  "duration_seconds": 0.0,
+  "confusion_matrix": {
+    "true_positive": 1,
+    "false_positive": 0,
+    "true_negative": 5,
+    "false_negative": 2
+  },
+  "precision": 1.0,
+  "recall": 0.333,
+  "f1": 0.5,
+  "calibration_score": 0.75,
+  "calibration_by_tier": {
+    "HIGH": {
+      "correct": 0,
+      "total": 0,
+      "rate": null
+    },
+    "MED": {
+      "correct": 6,
+      "total": 8,
+      "rate": 0.75
+    },
+    "LOW": {
+      "correct": 0,
+      "total": 0,
+      "rate": null
+    }
+  },
+  "false_positive_cost_by_tier_inr": {
+    "HIGH": 0.0,
+    "MED": 0.0,
+    "LOW": 0.0
+  },
+  "total_cost_of_overconfidence_inr": 0.0,
+  "court_panel_llm_calls": 0,
+  "court_panel_heuristic_fallback_calls": 8,
+  "case_ids": [
+    "case_0f8eb4b72b_friendly_fraud",
+    "case_adb019dcde_refund_abuse",
+    "case_0a5c81430e_account_takeover",
+    "case_5ca452a03e_friendly_fraud",
+    "case_6078ab6da8_account_takeover",
+    "case_79830ce5b6_friendly_fraud",
+    "case_b722c9caaa_friendly_fraud",
+    "case_8d0a8cbf9d_friendly_fraud"
+  ]
+}
